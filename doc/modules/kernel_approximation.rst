@@ -19,12 +19,15 @@ can be better suited for online learning and can significantly reduce the cost
 of learning with very large datasets.
 Standard kernelized SVMs do not scale well to large datasets, but using an
 approximate kernel map it is possible to use much more efficient linear SVMs.
-In particularly the combination of kernel map approximations with
+In particular, the combination of kernel map approximations with
 :class:`SGDClassifier` can make non-linear learning on large datasets possible.
 
 Since there has not been much empirical work using approximate embeddings, it
 is advisable to compare results against exact kernel methods when possible.
 
+.. seealso::
+
+   :ref:`polynomial_regression` for an exact polynomial transformation.
 
 .. currentmodule:: sklearn.kernel_approximation
 
@@ -57,10 +60,11 @@ a linear algorithm, for example a linear SVM::
     >>> X_features = rbf_feature.fit_transform(X)
     >>> clf = SGDClassifier()   # doctest: +NORMALIZE_WHITESPACE
     >>> clf.fit(X_features, y)
-    SGDClassifier(alpha=0.0001, class_weight=None, epsilon=0.1, eta0=0.0,
-           fit_intercept=True, l1_ratio=0.15, learning_rate='optimal',
-           loss='hinge', n_iter=5, n_jobs=1, penalty='l2', power_t=0.5,
-           random_state=None, shuffle=False, verbose=0, warm_start=False)
+    SGDClassifier(alpha=0.0001, average=False, class_weight=None, epsilon=0.1,
+           eta0=0.0, fit_intercept=True, l1_ratio=0.15,
+           learning_rate='optimal', loss='hinge', n_iter=5, n_jobs=1,
+           penalty='l2', power_t=0.5, random_state=None, shuffle=True,
+           verbose=0, warm_start=False)
     >>> clf.score(X_features, y)
     1.0
 
@@ -83,7 +87,7 @@ For a given value of ``n_components`` :class:`RBFSampler` is often less accurate
 as :class:`Nystroem`. :class:`RBFSampler` is cheaper to compute, though, making
 use of larger feature spaces more efficient.
 
-.. figure:: ../auto_examples/images/plot_kernel_approximation_2.png
+.. figure:: ../auto_examples/images/plot_kernel_approximation_002.png
     :target: ../auto_examples/plot_kernel_approximation.html
     :scale: 50%
     :align: center

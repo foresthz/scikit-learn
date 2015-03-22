@@ -18,7 +18,9 @@ clean: clean-ctags
 
 in: inplace # just a shortcut
 inplace:
-	rm -f sklearn/utils.sparsefuncs*.so  # to avoid errors in 0.15 upgrade
+	# to avoid errors in 0.15 upgrade
+	rm -f sklearn/utils/sparsefuncs*.so
+	rm -f sklearn/utils/random*.so
 	$(PYTHON) setup.py build_ext -i
 
 test-code: in
@@ -26,7 +28,7 @@ test-code: in
 test-sphinxext:
 	$(NOSETESTS) -s -v doc/sphinxext/
 test-doc:
-	$(NOSETESTS) -s -v doc/ doc/modules/ doc/datasets/ \
+	$(NOSETESTS) -s -v doc/*.rst doc/modules/ doc/datasets/ \
 	doc/developers doc/tutorial/basic doc/tutorial/statistical_inference \
 	doc/tutorial/text_analytics
 

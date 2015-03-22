@@ -4,7 +4,14 @@
 # The behavior of the script is controlled by environment variabled defined
 # in the .travis.yml in the top level folder of the project.
 
+# License: 3-clause BSD
+
 set -e
+
+# Fix the compilers to workaround avoid having the Python 3.4 build
+# lookup for g++44 unexpectedly.
+export CC=gcc
+export CXX=g++
 
 sudo apt-get update -qq
 if [[ "$INSTALL_ATLAS" == "true" ]]; then
@@ -18,10 +25,10 @@ if [[ "$DISTRIB" == "conda" ]]; then
 
     # Use the miniconda installer for faster download / install of conda
     # itself
-    wget http://repo.continuum.io/miniconda/Miniconda-2.2.2-Linux-x86_64.sh \
+    wget http://repo.continuum.io/miniconda/Miniconda-3.6.0-Linux-x86_64.sh \
         -O miniconda.sh
     chmod +x miniconda.sh && ./miniconda.sh -b
-    export PATH=/home/travis/anaconda/bin:$PATH
+    export PATH=/home/travis/miniconda/bin:$PATH
     conda update --yes conda
 
     # Configure the conda environment and put it in the path using the
@@ -40,10 +47,24 @@ if [[ "$DISTRIB" == "conda" ]]; then
 
 elif [[ "$DISTRIB" == "ubuntu" ]]; then
     # Use standard ubuntu packages in their default version
-    sudo apt-get install -qq python-scipy python-nose python-pip
+    sudo apt-get install -qq python-scipy
+    # At the time of writing numpy 1.9.1 is included in the travis
+    # virtualenv but we want to used numpy installed through apt-get
+    # install.
+    deactivate
+    # Create a new virtualenv using system site packages for numpy and scipy
+    virtualenv --system-site-packages testvenv
+    source testvenv/bin/activate
+    pip install nose
 fi
 
 if [[ "$COVERAGE" == "true" ]]; then
     pip install coverage coveralls
 fi
-pip install nose-exclude
+
+# Build scikit-learn in the install.sh script to collapse the verbose
+# build output in the travis output when it succeeds.
+python --version
+python -c "import numpy; print('numpy %s' % numpy.__version__)"
+python -c "import scipy; print('scipy %s' % scipy.__version__)"
+python setup.py build_ext --inplace

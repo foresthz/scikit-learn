@@ -16,7 +16,7 @@ For instance, in the example below, decision trees learn from data to
 approximate a sine curve with a set of if-then-else decision rules. The deeper
 the tree, the more complex the decision rules and the fitter the model.
 
-.. figure:: ../auto_examples/tree/images/plot_tree_regression_1.png
+.. figure:: ../auto_examples/tree/images/plot_tree_regression_001.png
    :target: ../auto_examples/tree/plot_tree_regression.html
    :scale: 75
    :align: center
@@ -90,10 +90,10 @@ Classification
 :class:`DecisionTreeClassifier` is a class capable of performing multi-class
 classification on a dataset.
 
-As other classifiers, :class:`DecisionTreeClassifier` take as input two
-arrays: an array X of size ``[n_samples, n_features]`` holding the training
-samples, and an array Y of integer values, size ``[n_samples]``, holding
-the class labels for the training samples::
+As other classifiers, :class:`DecisionTreeClassifier` take as input two arrays:
+an array X, sparse or dense, of size ``[n_samples, n_features]``  holding the
+training samples, and an array Y of integer values, size ``[n_samples]``,
+holding the class labels for the training samples::
 
     >>> from sklearn import tree
     >>> X = [[0, 0], [1, 1]]
@@ -101,10 +101,16 @@ the class labels for the training samples::
     >>> clf = tree.DecisionTreeClassifier()
     >>> clf = clf.fit(X, Y)
 
-After being fitted, the model can then be used to predict new values::
+After being fitted, the model can then be used to predict the class of samples::
 
     >>> clf.predict([[2., 2.]])
     array([1])
+
+Alternatively, the probability of each class can be predicted, which is the
+fraction of training samples of the same class in a leaf::
+
+    >>> clf.predict_proba([[2., 2.]])
+    array([[ 0.,  1.]])
 
 :class:`DecisionTreeClassifier` is capable of both binary (where the
 labels are [-1, 1]) classification and multiclass (where the labels are
@@ -155,12 +161,18 @@ a PDF file (or any other supported file type) directly in Python::
     .. figure:: ../images/iris.pdf
        :align: center
 
-After being fitted, the model can then be used to predict new values::
+After being fitted, the model can then be used to predict the class of samples::
 
-    >>> clf.predict(iris.data[0, :])
+    >>> clf.predict(iris.data[:1, :])
     array([0])
 
-.. figure:: ../auto_examples/tree/images/plot_iris_1.png
+Alternatively, the probability of each class can be predicted, which is the
+fraction of training samples of the same class in a leaf::
+
+    >>> clf.predict_proba(iris.data[:1, :])
+    array([[ 1.,  0.,  0.]])
+
+.. figure:: ../auto_examples/tree/images/plot_iris_001.png
    :target: ../auto_examples/tree/plot_iris.html
    :align: center
    :scale: 75
@@ -175,7 +187,7 @@ After being fitted, the model can then be used to predict new values::
 Regression
 ==========
 
-.. figure:: ../auto_examples/tree/images/plot_tree_regression_1.png
+.. figure:: ../auto_examples/tree/images/plot_tree_regression_001.png
    :target: ../auto_examples/tree/plot_tree_regression.html
    :scale: 75
    :align: center
@@ -194,7 +206,6 @@ instead of integer values::
     >>> clf = clf.fit(X, y)
     >>> clf.predict([[1, 1]])
     array([ 0.5])
-
 
 .. topic:: Examples:
 
@@ -240,7 +251,7 @@ The use of multi-output trees for regression is demonstrated in
 :ref:`example_tree_plot_tree_regression_multioutput.py`. In this example, the input
 X is a single real value and the outputs Y are the sine and cosine of X.
 
-.. figure:: ../auto_examples/tree/images/plot_tree_regression_multioutput_1.png
+.. figure:: ../auto_examples/tree/images/plot_tree_regression_multioutput_001.png
    :target: ../auto_examples/tree/plot_tree_regression_multioutput.html
    :scale: 75
    :align: center
@@ -250,7 +261,7 @@ The use of multi-output trees for classification is demonstrated in
 X are the pixels of the upper half of faces and the outputs Y are the pixels of
 the lower half of those faces.
 
-.. figure:: ../auto_examples/images/plot_multioutput_face_completion_1.png
+.. figure:: ../auto_examples/images/plot_multioutput_face_completion_001.png
    :target: ../auto_examples/plot_multioutput_face_completion.html
    :scale: 75
    :align: center
@@ -336,6 +347,13 @@ Tips on practical use
 
   * All decision trees use ``np.float32`` arrays internally.
     If training data is not in this format, a copy of the dataset will be made.
+
+  * If the input matrix X is very sparse, it is recommended to convert to sparse
+    ``csc_matrix` before calling fit and sparse ``csr_matrix`` before calling
+    predict. Training time can be orders of magnitude faster for a sparse
+    matrix input compared to a dense matrix when features have zero values in
+    most of the samples.
+
 
 
 .. _tree_algorithms:

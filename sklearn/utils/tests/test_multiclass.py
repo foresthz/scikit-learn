@@ -1,4 +1,7 @@
+from __future__ import division
 import numpy as np
+import scipy.sparse as sp
+
 from itertools import product
 from functools import partial
 from sklearn.externals.six.moves import xrange
@@ -12,6 +15,7 @@ from scipy.sparse import dok_matrix
 from scipy.sparse import lil_matrix
 
 from sklearn.utils.testing import assert_array_equal
+from sklearn.utils.testing import assert_array_almost_equal
 from sklearn.utils.testing import assert_equal
 from sklearn.utils.testing import assert_true
 from sklearn.utils.testing import assert_false
@@ -24,6 +28,19 @@ from sklearn.utils.multiclass import is_label_indicator_matrix
 from sklearn.utils.multiclass import is_multilabel
 from sklearn.utils.multiclass import is_sequence_of_sequences
 from sklearn.utils.multiclass import type_of_target
+from sklearn.utils.multiclass import class_distribution
+
+
+class NotAnArray(object):
+    """An object that is convertable to an array. This is useful to
+    simulate a Pandas timeseries."""
+
+    def __init__(self, data):
+        self.data = data
+
+    def __array__(self):
+        return self.data
+
 
 EXAMPLES = {
     'multilabel-indicator': [
@@ -41,6 +58,7 @@ EXAMPLES = {
         # Only valid when data is dense
         np.array([[-1, 1], [1, -1]]),
         np.array([[-3, 3], [3, -3]]),
+        NotAnArray(np.array([[-3, 3], [3, -3]])),
     ],
     'multilabel-sequences': [
         [[0, 1]],
@@ -52,6 +70,7 @@ EXAMPLES = {
         [[]],
         [()],
         np.array([[], [1, 2]], dtype='object'),
+        NotAnArray(np.array([[], [1, 2]], dtype='object')),
     ],
     'multiclass': [
         [1, 0, 2, 2, 1, 4, 2, 4, 4, 4],
@@ -61,6 +80,7 @@ EXAMPLES = {
         np.array([1, 0, 2], dtype=np.float),
         np.array([1, 0, 2], dtype=np.float32),
         np.array([[1], [0], [2]]),
+        NotAnArray(np.array([1, 0, 2])),
         [0, 1, 2],
         ['a', 'b', 'c'],
         np.array([u'a', u'b', u'c']),
@@ -77,6 +97,7 @@ EXAMPLES = {
         np.array([[u'a', u'b'], [u'c', u'd']]),
         np.array([[u'a', u'b'], [u'c', u'd']], dtype=object),
         np.array([[1, 0, 2]]),
+        NotAnArray(np.array([[1, 0, 2]])),
     ],
     'binary': [
         [0, 1],
@@ -90,6 +111,7 @@ EXAMPLES = {
         np.array([0, 1, 1, 1, 0, 0, 0, 1, 1, 1], dtype=np.float),
         np.array([0, 1, 1, 1, 0, 0, 0, 1, 1, 1], dtype=np.float32),
         np.array([[0], [1]]),
+        NotAnArray(np.array([[0], [1]])),
         [1, -1],
         [3, 5],
         ['a'],
@@ -124,6 +146,7 @@ EXAMPLES = {
         [{0: 'a', 1: 'b'}, {0: 'a'}],
     ]
 }
+
 
 NON_ARRAY_LIKE_EXAMPLES = [
     set([1, 2, 3]),
@@ -263,21 +286,21 @@ def test_is_label_indicator_matrix():
                 sparse_assert_, sparse_exp = assert_false, 'False'
 
             if (issparse(example) or
-                (isinstance(example, np.ndarray) and
-                 example.ndim == 2 and
-                 example.dtype.kind in 'biuf' and
-                 example.shape[1] > 0)):
-                    examples_sparse = [sparse_matrix(example)
-                                       for sparse_matrix in [coo_matrix,
-                                                             csc_matrix,
-                                                             csr_matrix,
-                                                             dok_matrix,
-                                                             lil_matrix]]
-                    for exmpl_sparse in examples_sparse:
-                        sparse_assert_(is_label_indicator_matrix(exmpl_sparse),
-                                       msg=('is_label_indicator_matrix(%r)'
-                                       ' should be %s')
-                                       % (exmpl_sparse, sparse_exp))
+                (hasattr(example, '__array__') and
+                 np.asarray(example).ndim == 2 and
+                 np.asarray(example).dtype.kind in 'biuf' and
+                 np.asarray(example).shape[1] > 0)):
+                examples_sparse = [sparse_matrix(example)
+                                   for sparse_matrix in [coo_matrix,
+                                                         csc_matrix,
+                                                         csr_matrix,
+                                                         dok_matrix,
+                                                         lil_matrix]]
+                for exmpl_sparse in examples_sparse:
+                    sparse_assert_(is_label_indicator_matrix(exmpl_sparse),
+                                   msg=('is_label_indicator_matrix(%r)'
+                                   ' should be %s')
+                                   % (exmpl_sparse, sparse_exp))
 
             # Densify sparse examples before testing
             if issparse(example):
@@ -313,6 +336,62 @@ def test_type_of_target():
 
     for example in NON_ARRAY_LIKE_EXAMPLES:
         assert_raises(ValueError, type_of_target, example)
+
+
+def test_class_distribution():
+    y = np.array([[1, 0, 0, 1],
+                  [2, 2, 0, 1],
+                  [1, 3, 0, 1],
+                  [4, 2, 0, 1],
+                  [2, 0, 0, 1],
+                  [1, 3, 0, 1]])
+    # Define the sparse matrix with a mix of implicit and explicit zeros
+    data = np.array([1, 2, 1, 4, 2, 1, 0, 2, 3, 2, 3, 1, 1, 1, 1, 1, 1])
+    indices = np.array([0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 5, 0, 1, 2, 3, 4, 5])
+    indptr = np.array([0, 6, 11, 11, 17])
+    y_sp = sp.csc_matrix((data, indices, indptr), shape=(6, 4))
+
+    classes, n_classes, class_prior = class_distribution(y)
+    classes_sp, n_classes_sp, class_prior_sp = class_distribution(y_sp)
+    classes_expected = [[1, 2, 4],
+                        [0, 2, 3],
+                        [0],
+                        [1]]
+    n_classes_expected = [3, 3, 1, 1]
+    class_prior_expected = [[3/6, 2/6, 1/6],
+                            [1/3, 1/3, 1/3],
+                            [1.0],
+                            [1.0]]
+
+    for k in range(y.shape[1]):
+        assert_array_almost_equal(classes[k], classes_expected[k])
+        assert_array_almost_equal(n_classes[k], n_classes_expected[k])
+        assert_array_almost_equal(class_prior[k], class_prior_expected[k])
+
+        assert_array_almost_equal(classes_sp[k], classes_expected[k])
+        assert_array_almost_equal(n_classes_sp[k], n_classes_expected[k])
+        assert_array_almost_equal(class_prior_sp[k], class_prior_expected[k])
+
+    # Test again with explicit sample weights
+    (classes,
+     n_classes,
+     class_prior) = class_distribution(y, [1.0, 2.0, 1.0, 2.0, 1.0, 2.0])
+    (classes_sp,
+     n_classes_sp,
+     class_prior_sp) = class_distribution(y, [1.0, 2.0, 1.0, 2.0, 1.0, 2.0])
+    class_prior_expected = [[4/9, 3/9, 2/9],
+                            [2/9, 4/9, 3/9],
+                            [1.0],
+                            [1.0]]
+
+    for k in range(y.shape[1]):
+        assert_array_almost_equal(classes[k], classes_expected[k])
+        assert_array_almost_equal(n_classes[k], n_classes_expected[k])
+        assert_array_almost_equal(class_prior[k], class_prior_expected[k])
+
+        assert_array_almost_equal(classes_sp[k], classes_expected[k])
+        assert_array_almost_equal(n_classes_sp[k], n_classes_expected[k])
+        assert_array_almost_equal(class_prior_sp[k], class_prior_expected[k])
 
 
 if __name__ == "__main__":

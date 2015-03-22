@@ -38,7 +38,7 @@ Nearest neighbor and the curse of dimensionality
 
 .. topic:: Classifying irises:
 
-    .. image:: ../../auto_examples/datasets/images/plot_iris_dataset_1.png
+    .. image:: ../../auto_examples/datasets/images/plot_iris_dataset_001.png
         :target: ../../auto_examples/datasets/plot_iris_dataset.html
         :align: right
 	:scale: 65
@@ -75,7 +75,7 @@ Scikit-learn documentation for more information about this type of classifier.)
 
 **KNN (k nearest neighbors) classification example**:
 
-.. image:: ../../auto_examples/neighbors/images/plot_classification_1.png
+.. image:: ../../auto_examples/neighbors/images/plot_classification_001.png
    :target: ../../auto_examples/neighbors/plot_classification.html
    :align: center
    :scale: 70
@@ -93,9 +93,9 @@ Scikit-learn documentation for more information about this type of classifier.)
     >>> # Create and fit a nearest-neighbor classifier
     >>> from sklearn.neighbors import KNeighborsClassifier
     >>> knn = KNeighborsClassifier()
-    >>> knn.fit(iris_X_train, iris_y_train)
+    >>> knn.fit(iris_X_train, iris_y_train) # doctest: +NORMALIZE_WHITESPACE
     KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
-               n_neighbors=5, p=2, weights='uniform')
+                   metric_params=None, n_neighbors=5, p=2, weights='uniform')
     >>> knn.predict(iris_X_test)
     array([1, 2, 1, 0, 0, 0, 2, 1, 2, 0])
     >>> iris_y_test
@@ -158,7 +158,7 @@ in it's simplest form, fits a linear model to the data set by adjusting
 a set of parameters in order to make the sum of the squared residuals
 of the model as small as possible.
 
-.. image:: ../../auto_examples/linear_model/images/plot_ols_1.png
+.. image:: ../../auto_examples/linear_model/images/plot_ols_001.png
    :target: ../../auto_examples/linear_model/plot_ols.html
    :scale: 40
    :align: right
@@ -175,7 +175,7 @@ Linear models: :math:`y = X\beta + \epsilon`
     >>> from sklearn import linear_model
     >>> regr = linear_model.LinearRegression()
     >>> regr.fit(diabetes_X_train, diabetes_y_train)
-    LinearRegression(copy_X=True, fit_intercept=True, normalize=False)
+    LinearRegression(copy_X=True, fit_intercept=True, n_jobs=1, normalize=False)
     >>> print(regr.coef_)
     [   0.30349955 -237.63931533  510.53060544  327.73698041 -814.13170937
       492.81458798  102.84845219  184.60648906  743.51961675   76.09517222]
@@ -199,7 +199,7 @@ Shrinkage
 If there are few data points per dimension, noise in the observations
 induces high variance:
 
-.. image:: ../../auto_examples/linear_model/images/plot_ols_ridge_variance_1.png
+.. image:: ../../auto_examples/linear_model/images/plot_ols_ridge_variance_001.png
    :target: ../../auto_examples/linear_model/plot_ols_ridge_variance.html
    :scale: 70
    :align: right
@@ -228,7 +228,7 @@ regression coefficients to zero: any two randomly chosen set of
 observations are likely to be uncorrelated. This is called :class:`Ridge`
 regression:
 
-.. image:: ../../auto_examples/linear_model/images/plot_ols_ridge_variance_2.png
+.. image:: ../../auto_examples/linear_model/images/plot_ols_ridge_variance_002.png
    :target: ../../auto_examples/linear_model/plot_ols_ridge_variance.html
    :scale: 70
    :align: right
@@ -253,7 +253,7 @@ We can choose ``alpha`` to minimize left out error, this time using the
 diabetes dataset rather than our synthetic data::
 
     >>> alphas = np.logspace(-4, -1, 6)
-    >>> from __future__ import print_function  
+    >>> from __future__ import print_function
     >>> print([regr.set_params(alpha=alpha
     ...             ).fit(diabetes_X_train, diabetes_y_train,
     ...             ).score(diabetes_X_test, diabetes_y_test) for alpha in alphas]) # doctest: +ELLIPSIS
@@ -274,15 +274,15 @@ Sparsity
 ----------
 
 
-.. |diabetes_ols_1| image:: ../../auto_examples/linear_model/images/plot_ols_3d_1.png
+.. |diabetes_ols_1| image:: ../../auto_examples/linear_model/images/plot_ols_3d_001.png
    :target: ../../auto_examples/linear_model/plot_ols_3d.html
    :scale: 65
 
-.. |diabetes_ols_3| image:: ../../auto_examples/linear_model/images/plot_ols_3d_3.png
+.. |diabetes_ols_3| image:: ../../auto_examples/linear_model/images/plot_ols_3d_003.png
    :target: ../../auto_examples/linear_model/plot_ols_3d.html
    :scale: 65
 
-.. |diabetes_ols_2| image:: ../../auto_examples/linear_model/images/plot_ols_3d_2.png
+.. |diabetes_ols_2| image:: ../../auto_examples/linear_model/images/plot_ols_3d_002.png
    :target: ../../auto_examples/linear_model/plot_ols_3d.html
    :scale: 65
 
@@ -327,8 +327,8 @@ application of Occam's razor: *prefer simpler models*.
     >>> regr.alpha = best_alpha
     >>> regr.fit(diabetes_X_train, diabetes_y_train)
     Lasso(alpha=0.025118864315095794, copy_X=True, fit_intercept=True,
-       max_iter=1000, normalize=False, positive=False, precompute='auto',
-       tol=0.0001, warm_start=False)
+       max_iter=1000, normalize=False, positive=False, precompute=False,
+       random_state=None, selection='cyclic', tol=0.0001, warm_start=False)
     >>> print(regr.coef_)
     [   0.         -212.43764548  517.19478111  313.77959962 -160.8303982    -0.
      -187.19554705   69.38229038  508.66011217   71.84239008]
@@ -349,7 +349,7 @@ application of Occam's razor: *prefer simpler models*.
 Classification
 ---------------
 
-.. image:: ../../auto_examples/linear_model/images/plot_logistic_1.png
+.. image:: ../../auto_examples/linear_model/images/plot_logistic_001.png
    :target: ../../auto_examples/linear_model/plot_logistic.html
    :scale: 65
    :align: right
@@ -370,12 +370,13 @@ function or **logistic** function:
     >>> logistic = linear_model.LogisticRegression(C=1e5)
     >>> logistic.fit(iris_X_train, iris_y_train)
     LogisticRegression(C=100000.0, class_weight=None, dual=False,
-              fit_intercept=True, intercept_scaling=1, penalty='l2',
-              random_state=None, tol=0.0001)
+              fit_intercept=True, intercept_scaling=1, max_iter=100,
+              multi_class='ovr', penalty='l2', random_state=None,
+              solver='liblinear', tol=0.0001, verbose=0)
 
 This is known as :class:`LogisticRegression`.
 
-.. image:: ../../auto_examples/linear_model/images/plot_iris_logistic_1.png
+.. image:: ../../auto_examples/linear_model/images/plot_iris_logistic_001.png
    :target: ../../auto_examples/linear_model/plot_iris_logistic.html
    :scale: 83
 
@@ -400,10 +401,10 @@ This is known as :class:`LogisticRegression`.
    model. Leave out the last 10% and test prediction performance on these
    observations.
 
-   .. literalinclude:: ../../auto_examples/exercises/plot_digits_classification_exercise.py
-       :lines: 12-17
+   .. literalinclude:: ../../auto_examples/exercises/digits_classification_exercise.py
+       :lines: 15-19
 
-   Solution: :download:`../../auto_examples/exercises/plot_digits_classification_exercise.py`
+   Solution: :download:`../../auto_examples/exercises/digits_classification_exercise.py`
 
 
 Support vector machines (SVMs)
@@ -423,11 +424,11 @@ the separating line (less regularization).
 
 .. currentmodule :: sklearn.svm
 
-.. |svm_margin_unreg| image:: ../../auto_examples/svm/images/plot_svm_margin_1.png
+.. |svm_margin_unreg| image:: ../../auto_examples/svm/images/plot_svm_margin_001.png
    :target: ../../auto_examples/svm/plot_svm_margin.html
    :scale: 70
 
-.. |svm_margin_reg| image:: ../../auto_examples/svm/images/plot_svm_margin_2.png
+.. |svm_margin_reg| image:: ../../auto_examples/svm/images/plot_svm_margin_002.png
    :target: ../../auto_examples/svm/plot_svm_margin.html
    :scale: 70
 
@@ -473,11 +474,11 @@ build a decision function that is not linear but may be polynomial instead.
 This is done using the *kernel trick* that can be seen as
 creating a decision energy by positioning *kernels* on observations:
 
-.. |svm_kernel_linear| image:: ../../auto_examples/svm/images/plot_svm_kernels_1.png
+.. |svm_kernel_linear| image:: ../../auto_examples/svm/images/plot_svm_kernels_001.png
    :target: ../../auto_examples/svm/plot_svm_kernels.html
    :scale: 65
 
-.. |svm_kernel_poly| image:: ../../auto_examples/svm/images/plot_svm_kernels_2.png
+.. |svm_kernel_poly| image:: ../../auto_examples/svm/images/plot_svm_kernels_002.png
    :target: ../../auto_examples/svm/plot_svm_kernels.html
    :scale: 65
 
@@ -515,7 +516,7 @@ creating a decision energy by positioning *kernels* on observations:
 
 
 
-.. |svm_kernel_rbf| image:: ../../auto_examples/svm/images/plot_svm_kernels_3.png
+.. |svm_kernel_rbf| image:: ../../auto_examples/svm/images/plot_svm_kernels_003.png
    :target: ../../auto_examples/svm/plot_svm_kernels.html
    :scale: 65
 
@@ -548,7 +549,7 @@ creating a decision energy by positioning *kernels* on observations:
    ``svm_gui.py``; add data points of both classes with right and left button,
    fit the model and change parameters and data.
 
-.. image:: ../../auto_examples/datasets/images/plot_iris_dataset_1.png
+.. image:: ../../auto_examples/datasets/images/plot_iris_dataset_001.png
     :target: ../../auto_examples/datasets/plot_iris_dataset.html
     :align: right
     :scale: 70
@@ -567,6 +568,6 @@ creating a decision energy by positioning *kernels* on observations:
    intuitions.
 
    .. literalinclude:: ../../auto_examples/exercises/plot_iris_exercise.py
-       :lines: 15-22
+       :lines: 18-23
 
    Solution: :download:`../../auto_examples/exercises/plot_iris_exercise.py`

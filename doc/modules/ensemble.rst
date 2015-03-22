@@ -108,7 +108,7 @@ construction.  The prediction of the ensemble is given as the averaged
 prediction of the individual classifiers.
 
 As other classifiers, forest classifiers have to be fitted with two
-arrays: an array X of size ``[n_samples, n_features]`` holding the
+arrays: a sparse or dense array X of size ``[n_samples, n_features]`` holding the
 training samples, and an array Y of size ``[n_samples]`` holding the
 target values (class labels) for the training samples::
 
@@ -181,7 +181,7 @@ in bias::
     >>> scores.mean() > 0.999
     True
 
-.. figure:: ../auto_examples/ensemble/images/plot_forest_iris_1.png
+.. figure:: ../auto_examples/ensemble/images/plot_forest_iris_001.png
     :target: ../auto_examples/ensemble/plot_forest_iris.html
     :align: center
     :scale: 75%
@@ -199,13 +199,14 @@ greater the reduction of variance, but also the greater the increase in
 bias. Empirical good default values are ``max_features=n_features``
 for regression problems, and ``max_features=sqrt(n_features)`` for
 classification tasks (where ``n_features`` is the number of features
-in the data). The best results are also usually reached when setting
-``max_depth=None`` in combination with ``min_samples_split=1`` (i.e.,
-when fully developing the trees). Bear in mind though that these values
-are usually not optimal. The best parameter values should always be cross-
-validated. In addition, note that bootstrap samples are used by default
-in random forests (``bootstrap=True``) while the default strategy is to
-use the original dataset for building extra-trees (``bootstrap=False``).
+in the data). Good results are often achieved when setting ``max_depth=None``
+in combination with ``min_samples_split=1`` (i.e., when fully developing the
+trees). Bear in mind though that these values are usually not optimal, and
+might result in models that consume a lot of ram. The best parameter values
+should always be cross-validated. In addition, note that in random forests,
+bootstrap samples are used by default (``bootstrap=True``)
+while the default strategy for extra-trees is to use the whole dataset
+(``bootstrap=False``).
 
 Parallelization
 ---------------
@@ -257,7 +258,7 @@ The following example shows a color-coded representation of the relative
 importances of each individual pixel for a face recognition task using
 a :class:`ExtraTreesClassifier` model.
 
-.. figure:: ../auto_examples/ensemble/images/plot_forest_importances_faces_1.png
+.. figure:: ../auto_examples/ensemble/images/plot_forest_importances_faces_001.png
    :target: ../auto_examples/ensemble/plot_forest_importances_faces.html
    :align: center
    :scale: 75
@@ -333,7 +334,7 @@ ever-increasing influence. Each subsequent weak learner is thereby forced to
 concentrate on the examples that are missed by the previous ones in the sequence
 [HTF]_.
 
-.. figure:: ../auto_examples/ensemble/images/plot_adaboost_hastie_10_2_1.png
+.. figure:: ../auto_examples/ensemble/images/plot_adaboost_hastie_10_2_001.png
    :target: ../auto_examples/ensemble/plot_adaboost_hastie_10_2.html
    :align: center
    :scale: 75
@@ -434,7 +435,7 @@ Classification
 ---------------
 
 :class:`GradientBoostingClassifier` supports both binary and multi-class
-classification via the deviance loss function (``loss='deviance'``).
+classification.
 The following example shows how to fit a gradient boosting classifier
 with 100 decision stumps as weak learners::
 
@@ -497,7 +498,7 @@ to determine the optimal number of trees (i.e. ``n_estimators``) by early stoppi
 The plot on the right shows the feature importances which can be obtained via
 the ``feature_importances_`` property.
 
-.. figure:: ../auto_examples/ensemble/images/plot_gradient_boosting_regression_1.png
+.. figure:: ../auto_examples/ensemble/images/plot_gradient_boosting_regression_001.png
    :target: ../auto_examples/ensemble/plot_gradient_boosting_regression.html
    :align: center
    :scale: 75
@@ -649,6 +650,10 @@ the parameter ``loss``:
       prior probability of each class. At each iteration ``n_classes``
       regression trees have to be constructed which makes GBRT rather
       inefficient for data sets with a large number of classes.
+    * Exponential loss (``'exponential'``): The same loss function
+      as :class:`AdaBoostClassifier`. Less robust to mislabeled
+      examples than ``'deviance'``; can only be used for binary
+      classification.
 
 Regularization
 ----------------
@@ -694,7 +699,7 @@ outperforms no-shrinkage. Subsampling with shrinkage can further increase
 the accuracy of the model. Subsampling without shrinkage, on the other hand,
 does poorly.
 
-.. figure:: ../auto_examples/ensemble/images/plot_gradient_boosting_regularization_1.png
+.. figure:: ../auto_examples/ensemble/images/plot_gradient_boosting_regularization_001.png
    :target: ../auto_examples/ensemble/plot_gradient_boosting_regularization.html
    :align: center
    :scale: 75
@@ -785,7 +790,7 @@ usually chosen among the most important features.
 The Figure below shows four one-way and one two-way partial dependence plots
 for the California housing dataset:
 
-.. figure:: ../auto_examples/ensemble/images/plot_partial_dependence_1.png
+.. figure:: ../auto_examples/ensemble/images/plot_partial_dependence_001.png
    :target: ../auto_examples/ensemble/plot_partial_dependence.html
    :align: center
    :scale: 70
@@ -888,4 +893,3 @@ averaged.
  .. [HTF2009] T. Hastie, R. Tibshirani and J. Friedman, "Elements of Statistical Learning Ed. 2", Springer, 2009.
 
  .. [R2007] G. Ridgeway, "Generalized Boosted Models: A guide to the gbm package", 2007
-

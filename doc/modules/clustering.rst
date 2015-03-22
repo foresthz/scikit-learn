@@ -33,7 +33,7 @@ data can be found in the ``labels_`` attribute.
 Overview of clustering methods
 ===============================
 
-.. figure:: ../auto_examples/cluster/images/plot_cluster_comparison_1.png
+.. figure:: ../auto_examples/cluster/images/plot_cluster_comparison_001.png
    :target: ../auto_examples/cluster/plot_cluster_comparison.html
    :align: center
    :scale: 50
@@ -101,6 +101,12 @@ Overview of clustering methods
      - Flat geometry, good for density estimation
      - Mahalanobis distances to  centers
 
+   * - :ref:`Birch`
+     - branching factor, threshold, optional global clusterer.
+     - Large ``n_clusters`` and ``n_samples``
+     - Large dataset, outlier removal, data reduction.
+     - Euclidean distance between points
+
 Non-flat geometry clustering is useful when the clusters have a specific
 shape, i.e. a non-flat manifold, and the standard euclidean distance is
 not the right metric. This case arises in the two top rows of the figure
@@ -161,7 +167,7 @@ and the new centroids are computed and the algorithm repeats these last two
 steps until this value is less than a threshold. In other words, it repeats
 until the centroids do not move significantly.
 
-.. image:: ../auto_examples/cluster/images/plot_kmeans_digits_1.png
+.. image:: ../auto_examples/cluster/images/plot_kmeans_digits_001.png
    :target: ../auto_examples/cluster/plot_kmeans_digits.html
    :align: right
    :scale: 35
@@ -180,7 +186,7 @@ value. This is not the case in this implementation: iteration stops when
 centroids move less than the tolerance.
 
 Given enough time, K-means will always converge, however this may be to a local
-minimum. This is highly dependent on the the initialization of the centroids.
+minimum. This is highly dependent on the initialization of the centroids.
 As a result, the computation is often done several times, with different
 initializations of the centroids. One method to help address this issue is the
 k-means++ initialization scheme, which has been implemented in scikit-learn
@@ -245,7 +251,7 @@ convergence or a predetermined number of iterations is reached.
 of the results is reduced. In practice this difference in quality can be quite
 small, as shown in the example and cited reference.
 
-.. figure:: ../auto_examples/cluster/images/plot_mini_batch_kmeans_1.png
+.. figure:: ../auto_examples/cluster/images/plot_mini_batch_kmeans_001.png
    :target: ../auto_examples/cluster/plot_mini_batch_kmeans.html
    :align: center
    :scale: 100
@@ -256,7 +262,7 @@ small, as shown in the example and cited reference.
  * :ref:`example_cluster_plot_mini_batch_kmeans.py`: Comparison of KMeans and
    MiniBatchKMeans
 
- * :ref:`example_document_clustering.py`: Document clustering using sparse
+ * :ref:`example_text_document_clustering.py`: Document clustering using sparse
    MiniBatchKMeans
 
  * :ref:`example_cluster_plot_dict_face_patches.py`
@@ -283,7 +289,7 @@ values from other pairs. This updating happens iteratively until convergence,
 at which point the final exemplars are chosen, and hence the final clustering
 is given.
 
-.. figure:: ../auto_examples/cluster/images/plot_affinity_propagation_1.png
+.. figure:: ../auto_examples/cluster/images/plot_affinity_propagation_001.png
    :target: ../auto_examples/cluster/plot_affinity_propagation.html
    :align: center
    :scale: 50
@@ -384,7 +390,7 @@ Labelling a new sample is performed by finding the nearest centroid for a
 given sample.
 
 
-.. figure:: ../auto_examples/cluster/images/plot_mean_shift_1.png
+.. figure:: ../auto_examples/cluster/images/plot_mean_shift_001.png
    :target: ../auto_examples/cluster/plot_mean_shift.html
    :align: center
    :scale: 50
@@ -424,11 +430,11 @@ graph vertices are pixels, and edges of the similarity graph are a
 function of the gradient of the image.
 
 
-.. |noisy_img| image:: ../auto_examples/cluster/images/plot_segmentation_toy_1.png
+.. |noisy_img| image:: ../auto_examples/cluster/images/plot_segmentation_toy_001.png
     :target: ../auto_examples/cluster/plot_segmentation_toy.html
     :scale: 50
 
-.. |segmented_img| image:: ../auto_examples/cluster/images/plot_segmentation_toy_2.png
+.. |segmented_img| image:: ../auto_examples/cluster/images/plot_segmentation_toy_002.png
     :target: ../auto_examples/cluster/plot_segmentation_toy.html
     :scale: 50
 
@@ -455,11 +461,11 @@ function of the gradient of the image.
  * :ref:`example_cluster_plot_lena_segmentation.py`: Spectral clustering
    to split the image of lena in regions.
 
-.. |lena_kmeans| image:: ../auto_examples/cluster/images/plot_lena_segmentation_1.png
+.. |lena_kmeans| image:: ../auto_examples/cluster/images/plot_lena_segmentation_001.png
     :target: ../auto_examples/cluster/plot_lena_segmentation.html
     :scale: 65
 
-.. |lena_discretize| image:: ../auto_examples/cluster/images/plot_lena_segmentation_2.png
+.. |lena_discretize| image:: ../auto_examples/cluster/images/plot_lena_segmentation_002.png
     :target: ../auto_examples/cluster/plot_lena_segmentation.html
     :scale: 65
 
@@ -476,7 +482,7 @@ reproducible, but it tends to create parcels of fairly even and
 geometrical shape.
 
 =====================================  =====================================
- ``assign_labels="kmeans"`              ``assign_labels="discretize"``
+ ``assign_labels="kmeans"``              ``assign_labels="discretize"``
 =====================================  =====================================
 |lena_kmeans|                          |lena_discretize|
 =====================================  =====================================
@@ -545,15 +551,15 @@ Different linkage type: Ward, complete and average linkage
 :class:`AgglomerativeClustering` supports Ward, average, and complete
 linkage strategies.
 
-.. image:: ../auto_examples/cluster/images/plot_digits_linkage_1.png
+.. image:: ../auto_examples/cluster/images/plot_digits_linkage_001.png
     :target: ../auto_examples/cluster/plot_digits_linkage.html
     :scale: 43
 
-.. image:: ../auto_examples/cluster/images/plot_digits_linkage_2.png
+.. image:: ../auto_examples/cluster/images/plot_digits_linkage_002.png
     :target: ../auto_examples/cluster/plot_digits_linkage.html
     :scale: 43
 
-.. image:: ../auto_examples/cluster/images/plot_digits_linkage_3.png
+.. image:: ../auto_examples/cluster/images/plot_digits_linkage_003.png
     :target: ../auto_examples/cluster/plot_digits_linkage.html
     :scale: 43
 
@@ -582,11 +588,11 @@ constraints forbid the merging of points that are not adjacent on the swiss
 roll, and thus avoid forming clusters that extend across overlapping folds of
 the roll.
 
-.. |unstructured| image:: ../auto_examples/cluster/images/plot_ward_structured_vs_unstructured_1.png
+.. |unstructured| image:: ../auto_examples/cluster/images/plot_ward_structured_vs_unstructured_001.png
         :target: ../auto_examples/cluster/plot_ward_structured_vs_unstructured.html
         :scale: 49
 
-.. |structured| image:: ../auto_examples/cluster/images/plot_ward_structured_vs_unstructured_2.png
+.. |structured| image:: ../auto_examples/cluster/images/plot_ward_structured_vs_unstructured_002.png
         :target: ../auto_examples/cluster/plot_ward_structured_vs_unstructured.html
         :scale: 49
 
@@ -634,19 +640,19 @@ enable only merging of neighboring pixels on an image, as in the
     clusters and almost empty ones. (see the discussion in
     :ref:`example_cluster_plot_agglomerative_clustering.py`).
 
-.. image:: ../auto_examples/cluster/images/plot_agglomerative_clustering_1.png
+.. image:: ../auto_examples/cluster/images/plot_agglomerative_clustering_001.png
     :target: ../auto_examples/cluster/plot_agglomerative_clustering.html
     :scale: 38
 
-.. image:: ../auto_examples/cluster/images/plot_agglomerative_clustering_2.png
+.. image:: ../auto_examples/cluster/images/plot_agglomerative_clustering_002.png
     :target: ../auto_examples/cluster/plot_agglomerative_clustering.html
     :scale: 38
 
-.. image:: ../auto_examples/cluster/images/plot_agglomerative_clustering_3.png
+.. image:: ../auto_examples/cluster/images/plot_agglomerative_clustering_003.png
     :target: ../auto_examples/cluster/plot_agglomerative_clustering.html
     :scale: 38
 
-.. image:: ../auto_examples/cluster/images/plot_agglomerative_clustering_4.png
+.. image:: ../auto_examples/cluster/images/plot_agglomerative_clustering_004.png
     :target: ../auto_examples/cluster/plot_agglomerative_clustering.html
     :scale: 38
 
@@ -670,15 +676,15 @@ The guidelines for choosing a metric is to use one that maximizes the
 distance between samples in different classes, and minimizes that within
 each class.
 
-.. image:: ../auto_examples/cluster/images/plot_agglomerative_clustering_metrics_5.png
+.. image:: ../auto_examples/cluster/images/plot_agglomerative_clustering_metrics_005.png
     :target: ../auto_examples/cluster/plot_agglomerative_clustering_metrics.html
     :scale: 32
 
-.. image:: ../auto_examples/cluster/images/plot_agglomerative_clustering_metrics_6.png
+.. image:: ../auto_examples/cluster/images/plot_agglomerative_clustering_metrics_006.png
     :target: ../auto_examples/cluster/plot_agglomerative_clustering_metrics.html
     :scale: 32
 
-.. image:: ../auto_examples/cluster/images/plot_agglomerative_clustering_metrics_7.png
+.. image:: ../auto_examples/cluster/images/plot_agglomerative_clustering_metrics_007.png
     :target: ../auto_examples/cluster/plot_agglomerative_clustering_metrics.html
     :scale: 32
 
@@ -728,7 +734,7 @@ indicating core samples found by the algorithm. Smaller circles are non-core
 samples that are still part of a cluster. Moreover, the outliers are indicated
 by black points below.
 
-.. |dbscan_results| image:: ../auto_examples/cluster/images/plot_dbscan_1.png
+.. |dbscan_results| image:: ../auto_examples/cluster/images/plot_dbscan_001.png
         :target: ../auto_examples/cluster/plot_dbscan.html
         :scale: 50
 
@@ -766,6 +772,96 @@ by black points below.
    Ester, M., H. P. Kriegel, J. Sander, and X. Xu,
    In Proceedings of the 2nd International Conference on Knowledge Discovery
    and Data Mining, Portland, OR, AAAI Press, pp. 226–231. 1996
+
+.. _birch:
+
+Birch
+=====
+
+The :class:`Birch` builds a tree called the Characteristic Feature Tree (CFT)
+for the given data. The data is essentially lossy compressed to a set of
+Characteristic Feature nodes (CF Nodes). The CF Nodes have a number of
+subclusters called Characteristic Feature subclusters (CF Subclusters)
+and these CF Subclusters located in the non-terminal CF Nodes
+can have CF Nodes as children.
+
+The CF Subclusters hold the necessary information for clustering which prevents
+the need to hold the entire input data in memory. This information includes:
+
+- Number of samples in a subcluster.
+- Linear Sum - A n-dimensional vector holding the sum of all samples
+- Squared Sum - Sum of the squared L2 norm of all samples.
+- Centroids - To avoid recalculation linear sum / n_samples.
+- Squared norm of the centroids.
+
+The Birch algorithm has two parameters, the threshold and the branching factor.
+The branching factor limits the number of subclusters in a node and the
+threshold limits the distance between the entering sample and the existing
+subclusters.
+
+This algorithm can be viewed as an instance or data reduction method,
+since it reduces the input data to a set of subclusters which are obtained directly
+from the leaves of the CFT. This reduced data can be further processed by feeding
+it into a global clusterer. This global clusterer can be set by ``n_clusters``.
+If ``n_clusters`` is set to None, the subclusters from the leaves are directly
+read off, otherwise a global clustering step labels these subclusters into global
+clusters (labels) and the samples are mapped to the global label of the nearest subcluster.
+
+**Algorithm description:**
+
+- A new sample is inserted into the root of the CF Tree which is a CF Node.
+  It is then merged with the subcluster of the root, that has the smallest
+  radius after merging, constrained by the threshold and branching factor conditions.
+  If the subcluster has any child node, then this is done repeatedly till it reaches
+  a leaf. After finding the nearest subcluster in the leaf, the properties of this
+  subcluster and the parent subclusters are recursively updated.
+
+- If the radius of the subcluster obtained by merging the new sample and the
+  nearest subcluster is greater than the square of the threshold and if the
+  number of subclusters is greater than the branching factor, then a space is temporarily
+  allocated to this new sample. The two farthest subclusters are taken and
+  the subclusters are divided into two groups on the basis of the distance
+  between these subclusters.
+
+- If this split node has a parent subcluster and there is room
+  for a new subcluster, then the parent is split into two. If there is no room,
+  then this node is again split into two and the process is continued
+  recursively, till it reaches the root.
+
+**Birch or MiniBatchKMeans?**
+
+ - Birch does not scale very well to high dimensional data. As a rule of thumb if
+   ``n_features`` is greater than twenty, it is generally better to use MiniBatchKMeans.
+ - If the number of instances of data needs to be reduced, or if one wants a
+   large number of subclusters either as a preprocessing step or otherwise,
+   Birch is more useful than MiniBatchKMeans.
+
+
+**How to use partial_fit?**
+
+To avoid the computation of global clustering, for every call of ``partial_fit``
+the user is advised
+
+ 1. To set ``n_clusters=None`` initially
+ 2. Train all data by multiple calls to partial_fit.
+ 3. Set ``n_clusters`` to a required value using
+    ``brc.set_params(n_clusters=n_clusters)``.
+ 4. Call ``partial_fit`` finally with no arguments, i.e ``brc.partial_fit()``
+    which performs the global clustering.
+
+.. image:: ../auto_examples/cluster/images/plot_birch_vs_minibatchkmeans_001.png
+    :target: ../auto_examples/cluster/plot_birch_vs_minibatchkmeans.html
+
+.. topic:: References:
+
+ * Tian Zhang, Raghu Ramakrishnan, Maron Livny
+   BIRCH: An efficient data clustering method for large databases.
+   http://www.cs.sfu.ca/CourseCentral/459/han/papers/zhang96.pdf
+
+ * Roberto Perdisci
+   JBirch - Java implementation of BIRCH clustering algorithm
+   https://code.google.com/p/jbirch/
+
 
 .. _clustering_evaluation:
 
@@ -1169,7 +1265,7 @@ Drawbacks
   smaller sample sizes or larger number of clusters it is safer to use
   an adjusted index such as the Adjusted Rand Index (ARI)**.
 
-.. figure:: ../auto_examples/cluster/images/plot_adjusted_for_chance_measures_1.png
+.. figure:: ../auto_examples/cluster/images/plot_adjusted_for_chance_measures_001.png
    :target: ../auto_examples/cluster/plot_adjusted_for_chance_measures.html
    :align: center
    :scale: 100
@@ -1221,7 +1317,7 @@ mean of homogeneity and completeness**:
 .. topic:: References
 
  .. [RH2007] `V-Measure: A conditional entropy-based external cluster evaluation
-   measure <http://acl.ldc.upenn.edu/D/D07/D07-1043.pdf>`_
+   measure <http://aclweb.org/anthology/D/D07/D07-1043.pdf>`_
    Andrew Rosenberg and Julia Hirschberg, 2007
 
  .. [B2011] `Identication and Characterization of Events in Social Media
@@ -1250,7 +1346,7 @@ of two scores:
 - **b**: The mean distance between a sample and all other points in the *next
   nearest cluster*.
 
-The Silhoeutte Coefficient *s* for a single sample is then given as:
+The Silhouette Coefficient *s* for a single sample is then given as:
 
 .. math:: s = \frac{b - a}{max(a, b)}
 

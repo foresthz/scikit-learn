@@ -6,16 +6,18 @@
 
 """Recursive feature elimination for feature ranking"""
 
+import warnings
 import numpy as np
-from ..utils import check_arrays, safe_sqr
+from ..utils import check_X_y, safe_sqr
+from ..utils.metaestimators import if_delegate_has_method
 from ..base import BaseEstimator
 from ..base import MetaEstimatorMixin
 from ..base import clone
 from ..base import is_classifier
 from ..cross_validation import _check_cv as check_cv
 from ..cross_validation import _safe_split, _score
-from .base import SelectorMixin
 from ..metrics.scorer import check_scoring
+from .base import SelectorMixin
 
 
 class RFE(BaseEstimator, MetaEstimatorMixin, SelectorMixin):
@@ -56,20 +58,23 @@ class RFE(BaseEstimator, MetaEstimatorMixin, SelectorMixin):
         Useful for doing grid searches when an `RFE` object is passed as an
         argument to, e.g., a `sklearn.grid_search.GridSearchCV` object.
 
+    verbose : int, default=0
+        Controls verbosity of output.
+
     Attributes
     ----------
-    `n_features_` : int
+    n_features_ : int
         The number of selected features.
 
-    `support_` : array of shape [n_features]
+    support_ : array of shape [n_features]
         The mask of selected features.
 
-    `ranking_` : array of shape [n_features]
-        The feature ranking, such that `ranking_[i]` corresponds to the \
-        ranking position of the i-th feature. Selected (i.e., estimated \
+    ranking_ : array of shape [n_features]
+        The feature ranking, such that ``ranking_[i]`` corresponds to the
+        ranking position of the i-th feature. Selected (i.e., estimated
         best) features are assigned rank 1.
 
-    `estimator_` : object
+    estimator_ : object
         The external estimator fit on the reduced dataset.
 
     Examples
@@ -98,7 +103,7 @@ class RFE(BaseEstimator, MetaEstimatorMixin, SelectorMixin):
            Mach. Learn., 46(1-3), 389--422, 2002.
     """
     def __init__(self, estimator, n_features_to_select=None, step=1,
-                 estimator_params={}, verbose=0):
+                 estimator_params=None, verbose=0):
         self.estimator = estimator
         self.n_features_to_select = n_features_to_select
         self.step = step
@@ -117,7 +122,7 @@ class RFE(BaseEstimator, MetaEstimatorMixin, SelectorMixin):
         y : array-like, shape = [n_samples]
             The target values.
         """
-        X, y = check_arrays(X, y, sparse_format="csc")
+        X, y = check_X_y(X, y, "csc")
         # Initialization
         n_features = X.shape[1]
         if self.n_features_to_select is None:
@@ -126,11 +131,18 @@ class RFE(BaseEstimator, MetaEstimatorMixin, SelectorMixin):
             n_features_to_select = self.n_features_to_select
 
         if 0.0 < self.step < 1.0:
-            step = int(self.step * n_features)
+            step = int(max(1, self.step * n_features))
         else:
             step = int(self.step)
         if step <= 0:
             raise ValueError("Step must be >0")
+
+        if self.estimator_params is not None:
+            warnings.warn("The parameter 'estimator_params' is deprecated as of version 0.16 "
+                          "and will be removed in 0.18. The parameter is no longer "
+                          "necessary because the value is set via the estimator initialisation "
+                          "or set_params function."
+                          , DeprecationWarning)
 
         support_ = np.ones(n_features, dtype=np.bool)
         ranking_ = np.ones(n_features, dtype=np.int)
@@ -141,7 +153,8 @@ class RFE(BaseEstimator, MetaEstimatorMixin, SelectorMixin):
 
             # Rank the remaining features
             estimator = clone(self.estimator)
-            estimator.set_params(**self.estimator_params)
+            if self.estimator_params:
+                estimator.set_params(**self.estimator_params)
             if self.verbose > 0:
                 print("Fitting estimator with %d features." % np.sum(support_))
 
@@ -162,7 +175,8 @@ class RFE(BaseEstimator, MetaEstimatorMixin, SelectorMixin):
 
         # Set final attributes
         self.estimator_ = clone(self.estimator)
-        self.estimator_.set_params(**self.estimator_params)
+        if self.estimator_params:
+            self.estimator_.set_params(**self.estimator_params)
         self.estimator_.fit(X[:, support_], y)
         self.n_features_ = support_.sum()
         self.support_ = support_
@@ -170,6 +184,7 @@ class RFE(BaseEstimator, MetaEstimatorMixin, SelectorMixin):
 
         return self
 
+    @if_delegate_has_method(delegate='estimator')
     def predict(self, X):
         """Reduce X to the selected features and then predict using the
            underlying estimator.
@@ -186,6 +201,7 @@ class RFE(BaseEstimator, MetaEstimatorMixin, SelectorMixin):
         """
         return self.estimator_.predict(self.transform(X))
 
+    @if_delegate_has_method(delegate='estimator')
     def score(self, X, y):
         """Reduce X to the selected features and then return the score of the
            underlying estimator.
@@ -203,16 +219,22 @@ class RFE(BaseEstimator, MetaEstimatorMixin, SelectorMixin):
     def _get_support_mask(self):
         return self.support_
 
+    @if_delegate_has_method(delegate='estimator')
     def decision_function(self, X):
         return self.estimator_.decision_function(self.transform(X))
 
+    @if_delegate_has_method(delegate='estimator')
     def predict_proba(self, X):
         return self.estimator_.predict_proba(self.transform(X))
+
+    @if_delegate_has_method(delegate='estimator')
+    def predict_log_proba(self, X):
+        return self.estimator_.predict_log_proba(self.transform(X))
 
 
 class RFECV(RFE, MetaEstimatorMixin):
     """Feature ranking with recursive feature elimination and cross-validated
-       selection of the best number of features.
+    selection of the best number of features.
 
     Parameters
     ----------
@@ -252,25 +274,31 @@ class RFECV(RFE, MetaEstimatorMixin):
 
     Attributes
     ----------
-    `n_features_` : int
+    n_features_ : int
         The number of selected features with cross-validation.
-    `support_` : array of shape [n_features]
+
+    support_ : array of shape [n_features]
         The mask of selected features.
 
-    `ranking_` : array of shape [n_features]
+    ranking_ : array of shape [n_features]
         The feature ranking, such that `ranking_[i]`
         corresponds to the ranking
         position of the i-th feature.
         Selected (i.e., estimated best)
         features are assigned rank 1.
 
-    `grid_scores_` : array of shape [n_subsets_of_features]
+    grid_scores_ : array of shape [n_subsets_of_features]
         The cross-validation scores such that
-        `grid_scores_[i]` corresponds to
+        ``grid_scores_[i]`` corresponds to
         the CV score of the i-th subset of features.
 
-    `estimator_` : object
+    estimator_ : object
         The external estimator fit on the reduced dataset.
+
+    Notes
+    -----
+    The size of ``grid_scores_`` is equal to (n_features + step - 2) // step + 1,
+    where step is the number of features removed at each iteration.
 
     Examples
     --------
@@ -298,12 +326,11 @@ class RFECV(RFE, MetaEstimatorMixin):
            Mach. Learn., 46(1-3), 389--422, 2002.
     """
     def __init__(self, estimator, step=1, cv=None, scoring=None,
-                 loss_func=None, estimator_params={}, verbose=0):
+                 estimator_params=None, verbose=0):
         self.estimator = estimator
         self.step = step
         self.cv = cv
         self.scoring = scoring
-        self.loss_func = loss_func
         self.estimator_params = estimator_params
         self.verbose = verbose
 
@@ -321,16 +348,22 @@ class RFECV(RFE, MetaEstimatorMixin):
             Target values (integers for classification, real numbers for
             regression).
         """
-        X, y = check_arrays(X, y, sparse_format="csr")
+        X, y = check_X_y(X, y, "csr")
+        if self.estimator_params is not None:
+            warnings.warn("The parameter 'estimator_params' is deprecated as of version 0.16 "
+                          "and will be removed in 0.18. The parameter is no longer "
+                          "necessary because the value is set via the estimator initialisation "
+                          "or set_params function."
+                          , DeprecationWarning)
         # Initialization
         rfe = RFE(estimator=self.estimator, n_features_to_select=1,
                   step=self.step, estimator_params=self.estimator_params,
                   verbose=self.verbose - 1)
 
         cv = check_cv(self.cv, X, y, is_classifier(self.estimator))
-        scorer = check_scoring(self.estimator, scoring=self.scoring,
-                               loss_func=self.loss_func)
+        scorer = check_scoring(self.estimator, scoring=self.scoring)
         scores = np.zeros(X.shape[1])
+        n_features_to_select_by_rank = np.zeros(X.shape[1])
 
         # Cross-validation
         for n, (train, test) in enumerate(cv):
@@ -338,26 +371,32 @@ class RFECV(RFE, MetaEstimatorMixin):
             X_test, y_test = _safe_split(self.estimator, X, y, test, train)
 
             # Compute a full ranking of the features
+            # ranking_ contains the same set of values for all CV folds,
+            # but perhaps reordered
             ranking_ = rfe.fit(X_train, y_train).ranking_
             # Score each subset of features
-            for k in range(0, max(ranking_)):
-                mask = np.where(ranking_ <= k + 1)[0]
+            for k in range(0, np.max(ranking_)):
+                indices = np.where(ranking_ <= k + 1)[0]
                 estimator = clone(self.estimator)
-                estimator.fit(X_train[:, mask], y_train)
-                score = _score(estimator, X_test[:, mask], y_test, scorer)
+                estimator.fit(X_train[:, indices], y_train)
+                score = _score(estimator, X_test[:, indices], y_test, scorer)
 
                 if self.verbose > 0:
                     print("Finished fold with %d / %d feature ranks, score=%f"
-                          % (k, max(ranking_), score))
+                          % (k + 1, np.max(ranking_), score))
                 scores[k] += score
+                # n_features_to_select_by_rank[k] is being overwritten
+                # multiple times, but by the same value
+                n_features_to_select_by_rank[k] = indices.size
 
-        # Pick the best number of features on average
+        # Select the best upper bound for feature rank. It's OK to use the
+        # last ranking_, as np.max(ranking_) is the same over all CV folds.
+        scores = scores[:np.max(ranking_)]
         k = np.argmax(scores)
-        best_score = scores[k]
 
         # Re-execute an elimination with best_k over the whole set
         rfe = RFE(estimator=self.estimator,
-                  n_features_to_select=k+1,
+                  n_features_to_select=n_features_to_select_by_rank[k],
                   step=self.step, estimator_params=self.estimator_params)
 
         rfe.fit(X, y)
@@ -367,8 +406,11 @@ class RFECV(RFE, MetaEstimatorMixin):
         self.n_features_ = rfe.n_features_
         self.ranking_ = rfe.ranking_
         self.estimator_ = clone(self.estimator)
-        self.estimator_.set_params(**self.estimator_params)
+        if self.estimator_params:
+            self.estimator_.set_params(**self.estimator_params)
         self.estimator_.fit(self.transform(X), y)
 
-        self.grid_scores_ = scores / n
+        # Fixing a normalization error, n is equal to len(cv) - 1
+        # here, the scores are normalized by len(cv)
+        self.grid_scores_ = scores / len(cv)
         return self
